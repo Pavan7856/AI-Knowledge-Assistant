@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: knowledge-assistant-backend:latest
+    container_name: knowledge_assistant_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - pdf_data:/app/data/uploads
+      - chroma_data:/app/chroma_db
+    networks:
+      - assistant_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: knowledge-assistant-frontend:latest
+    container_name: knowledge_assistant_frontend
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - assistant_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  pdf_data:
+    driver: local
+  chroma_data:
+    driver: local
+
+networks:
+  assistant_network:
+    driver: bridge
+

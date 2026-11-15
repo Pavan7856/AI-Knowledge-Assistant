@@ -1,0 +1,83 @@
+name: Enterprise AI Knowledge Assistant CI/CD Pipeline
+
+'on':
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # =================================================================
+  # Stage 1: Automated Unit, API & RAG Testing (CI)
+  # =================================================================
+  unit-and-integration-tests:
+    name: Run Automated Test Suites
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute Full Test Suite
+        run: |
+          python -m unittest discover tests
+
+  # =================================================================
+  # Stage 2: Docker Container Build & Verification
+  # =================================================================
+  docker-build-validation:
+    name: Build & Validate Docker Images
+    needs: unit-and-integration-tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Backend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.backend
+          push: false
+          tags: knowledge-assistant-backend:latest
+          load: true
+
+      - name: Build Frontend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.frontend
+          push: false
+          tags: knowledge-assistant-frontend:latest
+          load: true
+
+  # =================================================================
+  # Stage 3: Kubernetes Manifests Schema Validation
+  # =================================================================
+  k8s-manifest-validation:
+    name: Validate Kubernetes Manifests (Dry-Run)
+    needs: unit-and-integration-tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Validate Kubernetes Resources
+        run: |
+          kubectl apply --dry-run=client -k k8s/

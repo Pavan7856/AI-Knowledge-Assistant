@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pdf-storage-pvc
+  labels:
+    app.kubernetes.io/name: ai-knowledge-assistant
+    app.kubernetes.io/component: pdf-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chroma-storage-pvc
+  labels:
+    app.kubernetes.io/name: ai-knowledge-assistant
+    app.kubernetes.io/component: vector-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+

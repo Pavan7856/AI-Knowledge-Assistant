@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: ai-assistant-backend
+    app.kubernetes.io/name: ai-knowledge-assistant
+    app.kubernetes.io/component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-assistant-backend
+  template:
+    metadata:
+      labels:
+        app: ai-assistant-backend
+    spec:
+      containers:
+        - name: backend-api
+          image: knowledge-assistant-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: assistant-config
+            - secretRef:
+                name: assistant-secrets
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1536Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 2
+          volumeMounts:
+            - name: pdf-volume
+              mountPath: /app/data/uploads
+            - name: chroma-volume
+              mountPath: /app/chroma_db
+      volumes:
+        - name: pdf-volume
+          persistentVolumeClaim:
+            claimName: pdf-storage-pvc
+        - name: chroma-volume
+          persistentVolumeClaim:
+            claimName: chroma-storage-pvc
+
