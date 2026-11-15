@@ -137,3 +137,4 @@ Our automated pipeline (`.github/workflows/ci-cd.yml`) triggers on every push an
 1. **Testing Gate (CI):** Installs Python 3.11 with pip caching and runs all 34 automated unit, RAG, and integration tests.
 2. **Container Build Gate:** Builds and validates Docker images for backend and frontend using Buildx.
 3. **Kubernetes Validation Gate (CD Prep):** Performs dry-run schema validation (`kubectl apply --dry-run=client -k k8s/`) across all Kubernetes manifests to catch configuration errors before reaching production.
+

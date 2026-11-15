@@ -133,3 +133,4 @@ flowchart LR
 * **Resilience:** Liveness and readiness probes guarantee self-healing if a container encounters an unhandled exception.
 * **Data Persistence:** Persistent Volume Claims (PVC) prevent data loss during pod restarts or node rescheduling.
 * **Zero Vendor Lock-in for Embeddings:** Embeddings run completely locally using open-source ONNX models.
+
