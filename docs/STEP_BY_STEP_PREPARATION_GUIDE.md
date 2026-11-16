@@ -420,3 +420,4 @@ docker compose -f monitoring/docker-compose.monitoring.yml up -d
 - [x] **Observability:** Know the custom Prometheus metrics (`http_requests_total`, `http_request_duration_seconds`, `chromadb_chunks_total`).
 - [x] **CI/CD Automation:** Know the 3 GitHub Actions stages: Test -> Docker Build -> K8s Dry-run.
 - [x] **GitHub Repository:** Code is synced and live at `https://github.com/Pavan7856/AI-Knowledge-Assistant.git`.
+
