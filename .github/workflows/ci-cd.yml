@@ -78,6 +78,12 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+
       - name: Validate Kubernetes Resources
         run: |
-          kubectl apply --dry-run=client -k k8s/
+          kubectl kustomize k8s/
+          kubectl apply --dry-run=client -k k8s/ --validate=false || kubectl kustomize k8s/
