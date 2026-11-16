@@ -11,7 +11,7 @@ scrape_configs:
     metrics_path: '/metrics'
     scrape_interval: 5s
     static_configs:
-      - targets: ['backend:8000', 'host.docker.internal:8000']
+      - targets: ['host.docker.internal:8000']
         labels:
           service: 'knowledge-assistant-backend'
           environment: 'production'
